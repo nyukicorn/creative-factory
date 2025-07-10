@@ -15,7 +15,11 @@ from mcp_safety import safety_controller
 class KamuiMCPClient:
     """Kamui Code MCP通信クライアント"""
     
-    def __init__(self, config_path="/Users/nukuiyuki/.claude/mcp-kamuicode.json"):
+    def __init__(self, config_path=None):
+        if config_path is None:
+            # 環境に応じて設定パスを決定
+            home_dir = os.path.expanduser("~")
+            config_path = os.path.join(home_dir, ".claude", "mcp-kamuicode.json")
         self.config_path = config_path
         self.project_root = Path(__file__).parent.parent
         self.outputs_dir = self.project_root / "outputs"

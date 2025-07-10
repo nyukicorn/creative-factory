@@ -55,6 +55,7 @@ jobs:
     - name: Create Kamui MCP config
       run: |
         mkdir -p ~/.claude
+        echo "Creating Kamui MCP config at: ~/.claude/mcp-kamuicode.json"
         cat > ~/.claude/mcp-kamuicode.json << 'EOF'
         {
           "mcpServers": {
@@ -81,6 +82,9 @@ jobs:
           }
         }
         EOF
+        echo "Config file created. Verifying:"
+        ls -la ~/.claude/
+        cat ~/.claude/mcp-kamuicode.json
         
     - name: Run Creative Factory tests
       run: |

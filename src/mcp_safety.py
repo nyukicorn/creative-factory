@@ -34,7 +34,11 @@ PROCESSING_OPERATIONS = {
 class MCPSafetyController:
     """MCP操作の安全性を制御"""
     
-    def __init__(self, config_path="/Users/nukuiyuki/.claude/mcp-kamuicode.json"):
+    def __init__(self, config_path=None):
+        if config_path is None:
+            # 環境に応じて設定パスを決定
+            home_dir = os.path.expanduser("~")
+            config_path = os.path.join(home_dir, ".claude", "mcp-kamuicode.json")
         self.kamui_config_path = config_path
         self.strict_mode = os.getenv("KAMUI_STRICT_MODE", "true").lower() == "true"
     
