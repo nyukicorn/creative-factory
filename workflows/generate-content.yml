@@ -1,0 +1,195 @@
+name: Creative Content Generation
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_name:
+        description: 'Project name'
+        required: true
+        default: 'creative-project'
+      content_type:
+        description: 'Content type to generate'
+        required: true
+        type: choice
+        options:
+        - image
+        - video
+        - music
+        - 3d
+        - all
+      prompt:
+        description: 'Generation prompt'
+        required: true
+        default: 'Beautiful landscape'
+
+env:
+  MCP_CLOUD_RUN_URL: https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app
+  CLAUDE_AUTO_YES: "1"
+
+jobs:
+  generate-content:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        # Install Claude Code via curl
+        curl -fsSL https://claude.ai/install.sh | bash
+        export PATH="$HOME/.local/bin:$PATH"
+        
+        # Install Python dependencies
+        pip install -r requirements.txt
+        
+    - name: Setup Claude authentication
+      run: |
+        mkdir -p ~/.anthropic
+        echo "Setting up Claude authentication..."
+        if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+          echo "✅ API key found in secrets"
+          echo -n "${{ secrets.ANTHROPIC_API_KEY }}" > ~/.anthropic/api_key
+          echo "✅ API key file created"
+        else
+          echo "❌ No API key found in secrets"
+          exit 1
+        fi
+        
+    - name: Debug Claude API key file
+      run: |
+        echo "🔍 API key file debugging:"
+        ls -la ~/.anthropic/
+        echo "File size: $(wc -c < ~/.anthropic/api_key) bytes"
+        echo "File type: $(file ~/.anthropic/api_key)"
+        echo "First 20 chars: $(head -c 20 ~/.anthropic/api_key)"
+        echo "Has newlines: $(grep -c $ ~/.anthropic/api_key || echo 0)"
+        echo "Hex dump (first 40 bytes):"
+        hexdump -C ~/.anthropic/api_key | head -2
+        
+    - name: Create Kamui MCP config
+      run: |
+        mkdir -p ~/.claude
+        echo "Creating Kamui MCP config at: ~/.claude/mcp-kamuicode.json"
+        cat > ~/.claude/mcp-kamuicode.json << 'EOF'
+        {
+          "mcpServers": {
+            "t2i-google-imagen3": {
+              "type": "http",
+              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2i/google/imagen",
+              "description": "Google Imagen 3 Text-to-Image Generation"
+            },
+            "t2m-google-lyria": {
+              "type": "http", 
+              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2m/google/lyria",
+              "description": "Google Lyria Text-to-Music Generation"
+            },
+            "t2v-fal-veo3-fast": {
+              "type": "http",
+              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2v/fal/veo3/fast", 
+              "description": "Fal.ai Veo3 Fast Text-to-Video Generation"
+            },
+            "i2v-fal-hailuo-02-pro": {
+              "type": "http",
+              "url": "${{ env.MCP_CLOUD_RUN_URL }}/i2v/fal/minimax/hailuo-02/pro",
+              "description": "Fal.ai Hailuo-02 Pro Image-to-Video Generation"
+            }
+          }
+        }
+        EOF
+        
+    - name: Validate MCP config
+      run: |
+        echo "🔍 MCP config validation:"
+        ls -la ~/.claude/
+        echo "Config file size: $(wc -c < ~/.claude/mcp-kamuicode.json) bytes"
+        echo "JSON validation:"
+        python3 -c "import json; config=json.load(open('$HOME/.claude/mcp-kamuicode.json')); print(f'✅ Valid JSON with {len(config.get(\"mcpServers\", {}))} servers')"
+        
+    - name: Verify Claude Code installation
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        echo "🔍 Claude Code installation check:"
+        which claude || echo "❌ Claude not found in PATH"
+        ls -la ~/.local/bin/claude || echo "❌ Claude binary not found"
+        
+        echo "🔍 Testing Claude authentication:"
+        claude --version || echo "❌ Claude version check failed"
+        
+    - name: Test Claude Code basic functionality
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        echo "🧪 Testing Claude Code basic functionality..."
+        
+        # Test 1: Basic execution without MCP
+        echo "Test 1: Basic Claude execution"
+        echo "Hello, this is a test" | claude --print --dangerously-skip-permissions || {
+          echo "❌ Basic Claude test failed"
+          exit 1
+        }
+        
+        # Test 2: Authentication verification
+        echo "Test 2: Authentication check"
+        echo "What is 2+2?" | claude --print --dangerously-skip-permissions | grep -q "4" || {
+          echo "❌ Authentication test failed"
+          exit 1
+        }
+        
+        echo "✅ Basic Claude functionality confirmed"
+        
+    - name: Test Claude Code with MCP config
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        echo "🧪 Testing Claude Code with MCP config..."
+        
+        # Test MCP configuration loading
+        echo "MCP config test" | claude --mcp-config=$HOME/.claude/mcp-kamuicode.json --print --dangerously-skip-permissions || {
+          echo "❌ MCP config test failed"
+          exit 1
+        }
+        
+        echo "✅ MCP config test passed"
+        
+    - name: Run Creative Factory tests
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        echo "🧪 Running Creative Factory tests..."
+        python3 test_kamui.py || {
+          echo "❌ Creative Factory tests failed"
+          exit 1
+        }
+        
+    - name: Generate content with Kamui Code MCP
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        echo "🎨 Generating ${{ github.event.inputs.content_type }} content..."
+        echo "📝 Prompt: ${{ github.event.inputs.prompt }}"
+        
+        python3 src/generate.py \
+          --type "${{ github.event.inputs.content_type }}" \
+          --prompt "${{ github.event.inputs.prompt }}" || {
+          echo "❌ Content generation failed"
+          exit 1
+        }
+        
+    - name: List generated files
+      run: |
+        echo "📁 Generated files:"
+        find outputs/ -type f -name "*" -exec ls -la {} \; || echo "No files generated"
+        
+    - name: Upload generated assets
+      uses: actions/upload-artifact@v4
+      with:
+        name: generated-${{ github.event.inputs.project_name }}-${{ github.event.inputs.content_type }}
+        path: outputs/
+        if-no-files-found: warn

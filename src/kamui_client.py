@@ -71,18 +71,31 @@ class KamuiMCPClient:
             stdout, stderr = process.communicate(input=prompt)
             
             print(f"📤 Return code: {process.returncode}")
+            print(f"📥 Stdout length: {len(stdout)}")
             if stderr:
                 print(f"⚠️ Stderr: {stderr}")
+            else:
+                print("ℹ️ No stderr output")
             
             if process.returncode != 0:
-                raise Exception(f"Claude Code error (exit {process.returncode}): {stderr}")
+                error_msg = f"Claude Code error (exit {process.returncode})"
+                if stderr:
+                    error_msg += f": {stderr}"
+                if stdout:
+                    error_msg += f"\nStdout: {stdout[:500]}..."
+                raise Exception(error_msg)
             
             return stdout
             
         except FileNotFoundError as e:
             raise Exception(f"Claude Code not found. Make sure it's installed and in PATH: {e}")
+        except subprocess.TimeoutExpired:
+            raise Exception("Claude Code execution timeout")
         except Exception as e:
             print(f"❌ Error calling Claude Code: {e}")
+            print(f"🔍 Command: {' '.join(cmd)}")
+            print(f"🔍 Working dir: {working_dir}")
+            print(f"🔍 Config exists: {os.path.exists(self.config_path)}")
             raise
     
     def extract_urls_from_response(self, response_text):
