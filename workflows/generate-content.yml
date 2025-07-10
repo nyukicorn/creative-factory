@@ -55,16 +55,8 @@ jobs:
         
     - name: Setup Claude authentication
       run: |
-        mkdir -p ~/.anthropic
-        echo "Setting up Claude authentication..."
-        if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
-          echo "✅ API key found in secrets"
-          echo -n "${{ secrets.ANTHROPIC_API_KEY }}" > ~/.anthropic/api_key
-          echo "✅ API key file created"
-        else
-          echo "❌ No API key found in secrets"
-          exit 1
-        fi
+        echo "🔑 Using Claude subscription authentication..."
+        echo "✅ No API key required for subscription users"
         
     - name: Debug Claude API key file
       run: |
@@ -127,8 +119,6 @@ jobs:
         claude --version || echo "❌ Claude version check failed"
         
     - name: Test Claude Code basic functionality
-      env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         echo "🧪 Testing Claude Code basic functionality..."
@@ -150,8 +140,6 @@ jobs:
         echo "✅ Basic Claude functionality confirmed"
         
     - name: Test Claude Code with MCP config
-      env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         echo "🧪 Testing Claude Code with MCP config..."
@@ -165,8 +153,6 @@ jobs:
         echo "✅ MCP config test passed"
         
     - name: Run Creative Factory tests
-      env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         echo "🧪 Running Creative Factory tests..."
@@ -176,8 +162,6 @@ jobs:
         }
         
     - name: Generate content with Kamui Code MCP
-      env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         echo "🎨 Generating ${{ github.event.inputs.content_type }} content..."
