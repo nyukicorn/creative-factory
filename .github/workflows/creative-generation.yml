@@ -59,7 +59,7 @@ jobs:
         echo "Setting up Claude authentication..."
         if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
           echo "✅ API key found in secrets"
-          echo "${{ secrets.ANTHROPIC_API_KEY }}" > ~/.anthropic/api_key
+          echo -n "${{ secrets.ANTHROPIC_API_KEY }}" > ~/.anthropic/api_key
           echo "✅ API key file created"
           ls -la ~/.anthropic/
         else
@@ -114,6 +114,11 @@ jobs:
         
         echo "Testing Claude Code with MCP config..."
         echo "Simple test" | claude --mcp-config=/home/runner/.claude/mcp-kamuicode.json --print || echo "MCP test failed"
+        
+        echo "Debugging API key file..."
+        echo "File size: $(wc -c < ~/.anthropic/api_key)"
+        echo "File content (first 20 chars): $(head -c 20 ~/.anthropic/api_key)"
+        echo "File has newlines: $(grep -c $ ~/.anthropic/api_key)"
         
     - name: Run Creative Factory tests
       run: |
