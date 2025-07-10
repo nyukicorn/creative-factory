@@ -15,8 +15,12 @@ on:
         - image
         - video
         - music
-        - 3d-model
+        - 3d
         - all
+      prompt:
+        description: 'Generation prompt'
+        required: true
+        default: 'Beautiful landscape'
 
 env:
   MCP_CLOUD_RUN_URL: https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app
@@ -42,15 +46,58 @@ jobs:
     - name: Install dependencies
       run: |
         npm install -g @anthropics/claude-code
-        pip install requests
+        pip install -r requirements.txt
+        
+    - name: Create Kamui MCP config
+      run: |
+        mkdir -p ~/.claude
+        cat > ~/.claude/mcp-kamuicode.json << 'EOF'
+        {
+          "mcpServers": {
+            "t2i-google-imagen3": {
+              "type": "http",
+              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2i/google/imagen",
+              "description": "Google Imagen 3 Text-to-Image Generation"
+            },
+            "t2m-google-lyria": {
+              "type": "http", 
+              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2m/google/lyria",
+              "description": "Google Lyria Text-to-Music Generation"
+            },
+            "t2v-fal-veo3-fast": {
+              "type": "http",
+              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2v/fal/veo3/fast", 
+              "description": "Fal.ai Veo3 Fast Text-to-Video Generation"
+            },
+            "i2v-fal-hailuo-02-pro": {
+              "type": "http",
+              "url": "${{ env.MCP_CLOUD_RUN_URL }}/i2v/fal/minimax/hailuo-02/pro",
+              "description": "Fal.ai Hailuo-02 Pro Image-to-Video Generation"
+            }
+          }
+        }
+        EOF
+        
+    - name: Run Creative Factory tests
+      run: |
+        python3 test_kamui.py
         
     - name: Generate content with Kamui Code MCP
       run: |
-        echo "Generating ${{ github.event.inputs.content_type }} content..."
-        # クリエイティブ生成スクリプトをここで実行
+        echo "🎨 Generating ${{ github.event.inputs.content_type }} content..."
+        echo "📝 Prompt: ${{ github.event.inputs.prompt }}"
+        python3 src/generate.py \
+          --type "${{ github.event.inputs.content_type }}" \
+          --prompt "${{ github.event.inputs.prompt }}"
+        
+    - name: List generated files
+      run: |
+        echo "📁 Generated files:"
+        find outputs/ -type f -name "*" || echo "No files generated"
         
     - name: Upload generated assets
       uses: actions/upload-artifact@v4
       with:
-        name: generated-${{ github.event.inputs.project_name }}
+        name: generated-${{ github.event.inputs.project_name }}-${{ github.event.inputs.content_type }}
         path: outputs/
+        if-no-files-found: warn
