@@ -45,6 +45,13 @@ class KamuiMCPClient:
             # 非対話モードを強制
             env['CLAUDE_AUTO_YES'] = "1"
             
+            # API key環境変数を確認・設定
+            if 'ANTHROPIC_API_KEY' in os.environ:
+                env['ANTHROPIC_API_KEY'] = os.environ['ANTHROPIC_API_KEY']
+                print(f"✅ API key found in environment (length: {len(os.environ['ANTHROPIC_API_KEY'])})")
+            else:
+                print("⚠️ No ANTHROPIC_API_KEY found in environment")
+            
             # Claude Code実行コマンド
             cmd = [
                 "claude",
