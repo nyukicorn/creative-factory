@@ -19,7 +19,7 @@ class KamuiMCPClient:
         if config_path is None:
             # 環境に応じて設定パスを決定
             home_dir = os.path.expanduser("~")
-            config_path = os.path.join(home_dir, ".claude", "mcp-kamuicode.json")
+            config_path = os.path.join(home_dir, ".claude", "mcp-config.json")
         self.config_path = config_path
         self.project_root = Path(__file__).parent.parent
         self.outputs_dir = self.project_root / "outputs"
