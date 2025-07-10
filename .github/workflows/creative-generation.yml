@@ -109,6 +109,12 @@ jobs:
         ls -la ~/.local/bin/ || echo "~/.local/bin not found"
         claude --version || echo "Claude version check failed"
         
+        echo "Testing Claude Code basic functionality..."
+        echo "Hello test" | claude --print || echo "Basic Claude test failed"
+        
+        echo "Testing Claude Code with MCP config..."
+        echo "Simple test" | claude --mcp-config=/home/runner/.claude/mcp-kamuicode.json --print || echo "MCP test failed"
+        
     - name: Run Creative Factory tests
       run: |
         export PATH="$HOME/.local/bin:$PATH"
