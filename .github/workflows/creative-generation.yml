@@ -53,6 +53,11 @@ jobs:
         # Install Python dependencies
         pip install -r requirements.txt
         
+    - name: Setup Claude authentication
+      run: |
+        mkdir -p ~/.anthropic
+        echo "${{ secrets.ANTHROPIC_API_KEY }}" > ~/.anthropic/api_key
+        
     - name: Create Kamui MCP config
       run: |
         mkdir -p ~/.claude
