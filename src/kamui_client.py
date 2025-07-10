@@ -41,7 +41,9 @@ class KamuiMCPClient:
             # PATH環境変数を設定
             env = os.environ.copy()
             home_dir = os.path.expanduser("~")
-            env['PATH'] = f"{home_dir}/.local/bin:" + env.get('PATH', '')
+            env['PATH'] = f"{home_dir}/.local/bin:" + env['PATH']
+            # 非対話モードを強制
+            env['CLAUDE_AUTO_YES'] = "1"
             
             # Claude Code実行コマンド
             cmd = [
