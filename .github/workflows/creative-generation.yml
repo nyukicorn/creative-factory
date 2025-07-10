@@ -86,6 +86,14 @@ jobs:
         ls -la ~/.claude/
         cat ~/.claude/mcp-kamuicode.json
         
+    - name: Verify Claude Code installation
+      run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        echo "Checking Claude Code installation..."
+        which claude || echo "Claude not found in PATH"
+        ls -la ~/.local/bin/ || echo "~/.local/bin not found"
+        claude --version || echo "Claude version check failed"
+        
     - name: Run Creative Factory tests
       run: |
         export PATH="$HOME/.local/bin:$PATH"

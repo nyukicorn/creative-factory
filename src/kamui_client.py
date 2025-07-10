@@ -37,18 +37,23 @@ class KamuiMCPClient:
         if working_dir is None:
             working_dir = self.project_root
         
-        # 一時プロンプトファイル作成
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
-            f.write(prompt)
-            prompt_file = f.name
-        
         try:
-            # Claude Code実行
+            # PATH環境変数を設定
+            env = os.environ.copy()
+            home_dir = os.path.expanduser("~")
+            env['PATH'] = f"{home_dir}/.local/bin:" + env.get('PATH', '')
+            
+            # Claude Code実行コマンド
             cmd = [
                 "claude",
                 f"--mcp-config={self.config_path}",
-                "--"
+                "--print",
+                "--dangerously-skip-permissions"
             ]
+            
+            print(f"🔧 Executing: {' '.join(cmd)}")
+            print(f"📂 Working directory: {working_dir}")
+            print(f"📄 Config path: {self.config_path}")
             
             # プロンプトを標準入力で送信
             process = subprocess.Popen(
@@ -57,20 +62,26 @@ class KamuiMCPClient:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                cwd=working_dir
+                cwd=working_dir,
+                env=env
             )
             
             stdout, stderr = process.communicate(input=prompt)
             
+            print(f"📤 Return code: {process.returncode}")
+            if stderr:
+                print(f"⚠️ Stderr: {stderr}")
+            
             if process.returncode != 0:
-                raise Exception(f"Claude Code error: {stderr}")
+                raise Exception(f"Claude Code error (exit {process.returncode}): {stderr}")
             
             return stdout
             
-        finally:
-            # 一時ファイル削除
-            if os.path.exists(prompt_file):
-                os.unlink(prompt_file)
+        except FileNotFoundError as e:
+            raise Exception(f"Claude Code not found. Make sure it's installed and in PATH: {e}")
+        except Exception as e:
+            print(f"❌ Error calling Claude Code: {e}")
+            raise
     
     def extract_urls_from_response(self, response_text):
         """レスポンスからダウンロードURLを抽出"""
