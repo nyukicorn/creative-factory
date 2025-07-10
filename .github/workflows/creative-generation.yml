@@ -45,7 +45,11 @@ jobs:
         
     - name: Install dependencies
       run: |
-        npm install -g @anthropics/claude-code
+        # Install Claude Code via curl
+        curl -fsSL https://claude.ai/install.sh | bash
+        export PATH="$HOME/.local/bin:$PATH"
+        
+        # Install Python dependencies
         pip install -r requirements.txt
         
     - name: Create Kamui MCP config
@@ -80,10 +84,12 @@ jobs:
         
     - name: Run Creative Factory tests
       run: |
+        export PATH="$HOME/.local/bin:$PATH"
         python3 test_kamui.py
         
     - name: Generate content with Kamui Code MCP
       run: |
+        export PATH="$HOME/.local/bin:$PATH"
         echo "🎨 Generating ${{ github.event.inputs.content_type }} content..."
         echo "📝 Prompt: ${{ github.event.inputs.prompt }}"
         python3 src/generate.py \
