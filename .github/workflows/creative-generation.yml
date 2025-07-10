@@ -1,0 +1,56 @@
+name: Creative Content Generation
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_name:
+        description: 'Project name'
+        required: true
+        default: 'creative-project'
+      content_type:
+        description: 'Content type to generate'
+        required: true
+        type: choice
+        options:
+        - image
+        - video
+        - music
+        - 3d-model
+        - all
+
+env:
+  MCP_CLOUD_RUN_URL: https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app
+
+jobs:
+  generate-content:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        npm install -g @anthropics/claude-code
+        pip install requests
+        
+    - name: Generate content with Kamui Code MCP
+      run: |
+        echo "Generating ${{ github.event.inputs.content_type }} content..."
+        # クリエイティブ生成スクリプトをここで実行
+        
+    - name: Upload generated assets
+      uses: actions/upload-artifact@v4
+      with:
+        name: generated-${{ github.event.inputs.project_name }}
+        path: outputs/
