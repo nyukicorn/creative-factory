@@ -25,6 +25,7 @@ on:
 env:
   MCP_CLOUD_RUN_URL: https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app
   CLAUDE_AUTO_YES: "1"
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
 jobs:
   generate-content:
