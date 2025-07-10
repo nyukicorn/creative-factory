@@ -127,6 +127,8 @@ jobs:
         claude --version || echo "❌ Claude version check failed"
         
     - name: Test Claude Code basic functionality
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         echo "🧪 Testing Claude Code basic functionality..."
@@ -148,6 +150,8 @@ jobs:
         echo "✅ Basic Claude functionality confirmed"
         
     - name: Test Claude Code with MCP config
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         echo "🧪 Testing Claude Code with MCP config..."
@@ -161,6 +165,8 @@ jobs:
         echo "✅ MCP config test passed"
         
     - name: Run Creative Factory tests
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         echo "🧪 Running Creative Factory tests..."
@@ -170,6 +176,8 @@ jobs:
         }
         
     - name: Generate content with Kamui Code MCP
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       run: |
         export PATH="$HOME/.local/bin:$PATH"
         echo "🎨 Generating ${{ github.event.inputs.content_type }} content..."
