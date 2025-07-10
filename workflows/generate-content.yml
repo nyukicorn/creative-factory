@@ -58,47 +58,29 @@ jobs:
         echo "🔑 Using Claude subscription authentication..."
         echo "✅ No API key required for subscription users"
         
-    - name: Debug Claude API key file
-      run: |
-        echo "🔍 API key file debugging:"
-        ls -la ~/.anthropic/
-        echo "File size: $(wc -c < ~/.anthropic/api_key) bytes"
-        echo "File type: $(file ~/.anthropic/api_key)"
-        echo "First 20 chars: $(head -c 20 ~/.anthropic/api_key)"
-        echo "Has newlines: $(grep -c $ ~/.anthropic/api_key || echo 0)"
-        echo "Hex dump (first 40 bytes):"
-        hexdump -C ~/.anthropic/api_key | head -2
+        # MCP設定ファイルを配置
+        mkdir -p $HOME/.claude
+        echo "📝 MCP設定ファイルを配置..."
+        cp workflows/mcp-kamuicode.json $HOME/.claude/mcp-config.json
         
-    - name: Create Kamui MCP config
+        echo "✅ MCP設定ファイル配置確認"
+        ls -la $HOME/.claude/
+        
+        echo "📝 MCP設定内容確認:"
+        cat $HOME/.claude/mcp-config.json
+        
+        echo "🔍 Kamui Code MCP URLを確認"
+        grep -q "mcp-veo3-fast-only" $HOME/.claude/mcp-config.json && echo "✅ Kamui Code MCP確認済み" || echo "❌ 設定エラー"
+        
+    - name: Skip API key debugging (using subscription)
       run: |
-        mkdir -p ~/.claude
-        echo "Creating Kamui MCP config at: ~/.claude/mcp-kamuicode.json"
-        cat > ~/.claude/mcp-kamuicode.json << 'EOF'
-        {
-          "mcpServers": {
-            "t2i-google-imagen3": {
-              "type": "http",
-              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2i/google/imagen",
-              "description": "Google Imagen 3 Text-to-Image Generation"
-            },
-            "t2m-google-lyria": {
-              "type": "http", 
-              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2m/google/lyria",
-              "description": "Google Lyria Text-to-Music Generation"
-            },
-            "t2v-fal-veo3-fast": {
-              "type": "http",
-              "url": "${{ env.MCP_CLOUD_RUN_URL }}/t2v/fal/veo3/fast", 
-              "description": "Fal.ai Veo3 Fast Text-to-Video Generation"
-            },
-            "i2v-fal-hailuo-02-pro": {
-              "type": "http",
-              "url": "${{ env.MCP_CLOUD_RUN_URL }}/i2v/fal/minimax/hailuo-02/pro",
-              "description": "Fal.ai Hailuo-02 Pro Image-to-Video Generation"
-            }
-          }
-        }
-        EOF
+        echo "🔍 Skipping API key debugging for subscription users"
+        echo "✅ Using Claude subscription authentication"
+        
+    - name: Skip MCP config creation (already configured)
+      run: |
+        echo "🔍 MCP config already configured in Setup Claude authentication step"
+        echo "✅ Using static JSON file from repository"
         
     - name: Validate MCP config
       run: |

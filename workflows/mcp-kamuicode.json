@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "t2i-google-imagen3": {
+      "type": "http",
+      "url": "https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app/t2i/google/imagen",
+      "description": "Google Imagen 3 Text-to-Image"
+    },
+    "t2i-google-imagen3-fast": {
+      "type": "http",
+      "url": "https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app/t2i/google/imagen",
+      "description": "Google Imagen 3 Fast Text-to-Image"
+    },
+    "t2m-google-lyria": {
+      "type": "http",
+      "url": "https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app/t2m/google/lyria",
+      "description": "Google Lyria Text-to-Music ⭐"
+    },
+    "i2v-fal-hailuo-02-pro": {
+      "type": "http",
+      "url": "https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app/i2v/fal/minimax/hailuo-02/pro",
+      "description": "Fal.ai Hailuo-02 Pro Image-to-Video ⭐"
+    },
+    "i2i-fal-flux-kontext-max": {
+      "type": "http",
+      "url": "https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app/i2i/fal/flux/kontext/max",
+      "description": "Fal.ai Flux Kontext Max Image-to-Image ⭐"
+    },
+    "i2i3d-fal-hunyuan3d-v21": {
+      "type": "http",
+      "url": "https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app/i2i3d/fal/hunyuan/3d-v21",
+      "description": "Fal.ai Hunyuan3D v2.1 Image-to-3D Generation ⭐"
+    },
+    "v2v-fal-luma-dream-machine-ray2-modify": {
+      "type": "http",
+      "url": "https://mcp-veo3-fast-only-20250709-220921-05b3effb-zl3xx5lsaq-uc.a.run.app/v2v/fal/luma/dream-machine/ray-2/modify",
+      "description": "Fal.ai Luma Dream Machine Ray-2 Video-to-Video ⭐"
+    }
+  }
+}
