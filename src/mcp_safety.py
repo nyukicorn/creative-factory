@@ -38,7 +38,7 @@ class MCPSafetyController:
         if config_path is None:
             # 環境に応じて設定パスを決定
             home_dir = os.path.expanduser("~")
-            config_path = os.path.join(home_dir, ".claude", "mcp-config.json")
+            config_path = os.path.join(home_dir, ".claude", "mcp-kamuicode.json")
         self.kamui_config_path = config_path
         self.strict_mode = os.getenv("KAMUI_STRICT_MODE", "true").lower() == "true"
     

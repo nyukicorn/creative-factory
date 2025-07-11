@@ -62,16 +62,16 @@ jobs:
         # MCP設定ファイルを配置
         mkdir -p $HOME/.claude
         echo "📝 MCP設定ファイルを配置..."
-        cp workflows/mcp-kamuicode.json $HOME/.claude/mcp-config.json
+        cp workflows/mcp-kamuicode.json $HOME/.claude/mcp-kamuicode.json
         
         echo "✅ MCP設定ファイル配置確認"
         ls -la $HOME/.claude/
         
         echo "📝 MCP設定内容確認:"
-        cat $HOME/.claude/mcp-config.json
+        cat $HOME/.claude/mcp-kamuicode.json
         
         echo "🔍 Kamui Code MCP URLを確認"
-        grep -q "mcp-veo3-fast-only" $HOME/.claude/mcp-config.json && echo "✅ Kamui Code MCP確認済み" || echo "❌ 設定エラー"
+        grep -q "mcp-veo3-fast-only" $HOME/.claude/mcp-kamuicode.json && echo "✅ Kamui Code MCP確認済み" || echo "❌ 設定エラー"
         
     - name: Skip API key debugging (using subscription)
       run: |
